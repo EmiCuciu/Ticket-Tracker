@@ -37,8 +37,14 @@ public class GoogleOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 
         AuthResponse tokens = authService.loginWithGoogle(oAuth2User);
 
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setStatus(HttpStatus.OK.value());
-        objectMapper.writeValue(response.getWriter(), tokens);
+        String baseRedirect = request.getParameter("redirect");
+        if (baseRedirect == null || baseRedirect.isBlank()) {
+            baseRedirect = "http://localhost:5173/oauth2/callback";
+        }
+        String redirectUrl = baseRedirect
+                .replaceAll("#.*", "")
+                + "#access_token=" + tokens.getAccessToken()
+                + "&refresh_token=" + tokens.getRefreshToken();
+        response.sendRedirect(redirectUrl);
     }
 }
