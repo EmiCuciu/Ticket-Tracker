@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: outbox-relay
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+  mail:
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
+
+outbox:
+  relay:
+    poll-interval-ms: ${OUTBOX_RELAY_POLL_INTERVAL_MS:3000}
+
+logging:
+  level:
+    root: INFO
+    com.example.outbox: DEBUG

@@ -1,0 +1,71 @@
+spring:
+  application:
+    name: ticket-tracker
+  profiles:
+    active: dev
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ticket_tracker
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - openid
+              - profile
+              - email
+            redirect-uri: "{baseUrl}/api/login/oauth2/code/{registrationId}"
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+    listener:
+      simple:
+        retry:
+          enabled: true
+          initial-interval: 2000
+          max-attempts: 3
+          multiplier: 2
+
+app:
+  log:
+    name: app.log
+    path: ${user.dir}/demo/logs
+    archive-path: ${user.dir}/demo/logs/archive
+    max-history: 30
+  jwt:
+    secret-key: ${JWT_SECRET_KEY}
+    access-token-expiration-ms: ${JWT_EXPIRATION_MS}
+    refresh-token-expiration-days: ${REFRESH_TOKEN_EXP_DAYS}
+
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS}
+
+  security:
+    csrf-enabled: ${CSRF_STATUS}
+    paths-to-skip: ${SECURITY_PATHS_TO_SKIP}
+    role-endpoints:
+      ADMIN: ${SECURITY_ADMIN_ENDPOINTS}
+      PROJECT_MANAGER: ${SECURITY_PM_ENDPOINTS}
+      MEMBER: ${SECURITY_MEMBER_ENDPOINTS}
+
+  timezone: Europe/Bucharest
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+logging:
+  level:
+    org.springframework.cache: TRACE

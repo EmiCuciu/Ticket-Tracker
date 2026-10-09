@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Digest</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f4f6f8;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: #1f2937;
+            line-height: 1.5;
+        }
+        .wrapper {
+            max-width: 600px;
+            margin: 32px auto;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+        .header {
+            background: #2563eb;
+            color: #ffffff;
+            padding: 24px 32px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 32px;
+        }
+        .greeting {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        .intro {
+            color: #4b5563;
+            margin-bottom: 24px;
+        }
+        .ticket {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            background: #f9fafb;
+        }
+        .ticket-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #111827;
+            margin: 0 0 6px 0;
+        }
+        .meta {
+            font-size: 13px;
+            color: #6b7280;
+        }
+        .status {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .status-OPEN       { background: #dbeafe; color: #1d4ed8; }
+        .status-IN_PROGRESS { background: #fef3c7; color: #b45309; }
+        .status-DONE       { background: #d1fae5; color: #047857; }
+        .status-CANCELLED  { background: #f3f4f6; color: #6b7280; }
+        .footer {
+            padding: 20px 32px;
+            font-size: 13px;
+            color: #9ca3af;
+            text-align: center;
+            border-top: 1px solid #e5e7eb;
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="header">
+        <h1>Ticket Digest</h1>
+    </div>
+
+    <div class="content">
+        <p class="greeting">
+            Hello <strong th:text="${name}">Name</strong>,
+        </p>
+        <p class="intro">
+            You have the following tickets that are due soon or already overdue:
+        </p>
+
+        <div th:each="ticket : ${tickets}" class="ticket">
+            <p class="ticket-title" th:text="${ticket.title}">Ticket title</p>
+            <div class="meta">
+                    <span th:class="'status status-' + ${ticket.status}"
+                          th:text="${ticket.status}">OPEN</span>
+                &nbsp;·&nbsp;
+                Due:
+                <span th:text="${#temporals.format(ticket.dueDate, 'yyyy-MM-dd HH:mm')}">
+                        2026-09-22 09:00
+                    </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Please check your dashboard for more details.
+    </div>
+</div>
+</body>
+</html>

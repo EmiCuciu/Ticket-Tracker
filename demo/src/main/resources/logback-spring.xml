@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <springProperty scope="context" name="appName" source="spring.application.name" defaultValue="ticket-tracker"/>
+    <springProperty scope="context" name="env" source="spring.profiles.active" defaultValue="default"/>
+
+    <springProperty scope="context" name="logFileName" source="app.log.name" defaultValue="app.log"/>
+    <springProperty scope="context" name="logPath" source="app.log.path" defaultValue="${user.dir}/demo/logs"/>
+    <springProperty scope="context" name="logArchivePath" source="app.log.archive-path"
+                    defaultValue="${user.dir}/demo/logs/archive"/>
+    <springProperty scope="context" name="logMaxHistory" source="app.log.max-history" defaultValue="30"/>
+
+    <property name="JSON_HEADER"
+              value='{"environment":"${env}","app_name":"${appName}","trace_id":"%X{traceId:-N/A}"}'/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${JSON_HEADER} | %d{yyyy-MM-dd HH:mm:ss} | %-5level | %logger{36} | %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logPath}/${logFileName}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${logArchivePath}/app-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>${logMaxHistory}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${JSON_HEADER} | %d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+</configuration>

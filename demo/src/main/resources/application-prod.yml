@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://prod-db-server:5432/ticket_tracker_prod
+  jpa:
+    show-sql: false
+logging:
+  level:
+    org.hibernate.SQL: WARN

@@ -1,0 +1,352 @@
+components:
+  parameters:
+    TicketId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+  responses:
+    BadRequest:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: Specified Resource was Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  schemas:
+    Status:
+      type: string
+      enum: [ OPEN, IN_PROGRESS, DONE, CANCELLED ]
+
+    Priority:
+      type: string
+      enum: [ LOW, MEDIUM, HIGH, URGENT ]
+
+    UserSummaryDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        fullName:
+          type: string
+        email:
+          type: string
+
+    ProjectSummaryDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+
+    ProjectDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        createdBy:
+          $ref: '#/components/schemas/UserSummaryDto'
+        createdAt:
+          type: string
+          format: date-time
+
+    ProjectCreateRequest:
+      type: object
+      required: [ name ]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          pattern: '^(?!\s*$).+'
+        description:
+          type: string
+
+    TicketDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/Status'
+        priority:
+          $ref: '#/components/schemas/Priority'
+        project:
+          $ref: '#/components/schemas/ProjectSummaryDto'
+        assignee:
+          $ref: '#/components/schemas/UserSummaryDto'
+        dueDate:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    TicketCreateRequest:
+      type: object
+      required: [ title, status, priority, projectId ]
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 100
+          pattern: '^(?!\s*$).+'
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/Status'
+        priority:
+          $ref: '#/components/schemas/Priority'
+        projectId:
+          type: string
+          format: uuid
+        assigneeId:
+          type: string
+          format: uuid
+          nullable: true
+        dueDate:
+          type: string
+          format: date-time
+          nullable: true
+
+    TicketPutRequest:
+      type: object
+      required: [ title, status, priority ]
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/Status'
+        priority:
+          $ref: '#/components/schemas/Priority'
+        assigneeId:
+          type: string
+          format: uuid
+          nullable: true
+        dueDate:
+          type: string
+          format: date-time
+          nullable: true
+
+    TicketPatchRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 100
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        status:
+          allOf:
+            - $ref: '#/components/schemas/Status'
+          nullable: true
+        priority:
+          allOf:
+            - $ref: '#/components/schemas/Priority'
+          nullable: true
+        assigneeId:
+          type: string
+          format: uuid
+          nullable: true
+        dueDate:
+          type: string
+          format: date-time
+          nullable: true
+
+    CommentDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        ticketId:
+          type: string
+          format: uuid
+        author:
+          $ref: '#/components/schemas/UserSummaryDto'
+        body:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    CommentCreateRequest:
+      type: object
+      required: [ body ]
+      properties:
+        body:
+          type: string
+          minLength: 1
+          pattern: '^(?!\s*$).+'
+
+    ProjectPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectDto'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+
+    TicketPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/TicketDto'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+
+    CommentPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommentDto'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+        fieldErrors:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+
+    Role:
+      type: string
+      enum: [ ADMIN, PROJECT_MANAGER, MEMBER ]
+
+    RegisterRequest:
+      type: object
+      required: [ email, password, fullName ]
+      properties:
+        email:
+          type: string
+          format: email
+          pattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+          example: test@example.com
+        password:
+          type: string
+          minLength: 8
+        fullName:
+          type: string
+          minLength: 1
+
+    RegisterResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+        fullName:
+          type: string
+        role:
+          $ref: '#/components/schemas/Role'
+
+    LoginRequest:
+      type: object
+      required: [ email, password ]
+      properties:
+        email:
+          type: string
+          format: email
+          pattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+          example: test@example.com
+        password:
+          type: string
+
+    AuthResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        expiresIn:
+          type: integer
+          format: int64
+
+    RefreshTokenRequest:
+      type: object
+      required: [ refreshToken ]
+      properties:
+        refreshToken:
+          type: string
+          minLength: 1
